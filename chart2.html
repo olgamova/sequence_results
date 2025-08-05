@@ -1,0 +1,169 @@
+import React from 'react';
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell
+} from 'recharts';
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A2D9CE', '#D4E6F1', '#F7DC6F', '#AF7AC5'];
+
+// Data extracted directly from the uploaded CSV file
+const detailedRecruitmentData = [
+    {
+        "Job Role": "Regional CRM Marketing Director, EF",
+        "Imported Candidates": 82,
+        "Score > 60%": 15,
+        "Added to Sequence": 11,
+        "No Email": 1,
+        "Address not found": 1,
+        "Accepted LinkedIn Connect": 4,
+        "Answered via LInkedin": 3
+    },
+    {
+        "Job Role": "Director of Marketing, Hyatt",
+        "Imported Candidates": 21,
+        "Score > 60%": 18,
+        "Added to Sequence": 14,
+        "No Email": 5,
+        "Address not found": 4,
+        "Accepted LinkedIn Connect": 7,
+        "Answered via LInkedin": 1
+    },
+    {
+        "Job Role": "Director of Marketing, Dusit",
+        "Imported Candidates": 20,
+        "Score > 60%": 14,
+        "Added to Sequence": 9,
+        "No Email": 5,
+        "Address not found": 2,
+        "Accepted LinkedIn Connect": 3,
+        "Answered via LInkedin": 0
+    }
+];
+
+// --- Data Aggregation for Charts ---
+// Recruitment Funnel Analysis Data
+const recruitmentFunnelData = (() => {
+    let imported = 0, scored = 0, added = 0, connected = 0, answered = 0;
+    detailedRecruitmentData.forEach(d => {
+        imported += d["Imported Candidates"];
+        scored += d["Score > 60%"];
+        added += d["Added to Sequence"];
+        connected += d["Accepted LinkedIn Connect"];
+        answered += d["Answered via LInkedin"];
+    });
+    return [
+        { name: 'Imported Candidates', value: imported },
+        { name: 'Score > 60%', value: scored },
+        { name: 'Added to Sequence', value: added },
+        { name: 'Accepted LinkedIn Connect', value: connected },
+        { name: 'Answered via LInkedin', value: answered }
+    ];
+})();
+
+// Contact Issues Breakdown Data
+const contactIssuesData = (() => {
+    let noEmail = 0, addressNotFound = 0;
+    detailedRecruitmentData.forEach(d => {
+        noEmail += d["No Email"];
+        addressNotFound += d["Address not found"];
+    });
+    return [
+        { name: 'No Email', value: noEmail },
+        { name: 'Address not found', value: addressNotFound }
+    ];
+})();
+
+const App = () => {
+    return (
+        <div className="bg-gray-100 p-8 min-h-screen font-sans">
+            <h1 className="text-4xl font-extrabold text-center text-gray-800 mb-10">Recruitment Analysis Dashboard</h1>
+
+            {/* Recruitment Funnel Analysis */}
+            <div className="bg-white p-6 rounded-lg shadow-xl mb-8">
+                <h2 className="text-2xl font-bold text-gray-700 text-center mb-6">Recruitment Funnel Analysis</h2>
+                <div className="h-96">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart
+                            data={recruitmentFunnelData}
+                            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                            layout="vertical"
+                        >
+                            <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                            <XAxis type="number" stroke="#555" />
+                            <YAxis type="category" dataKey="name" stroke="#555" />
+                            <Tooltip
+                                contentStyle={{ borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
+                                labelStyle={{ fontWeight: 'bold' }}
+                            />
+                            <Legend />
+                            <Bar dataKey="value" fill="#8884d8" name="Total Count" barSize={30} />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+            </div>
+
+            {/* Contact Issues Breakdown */}
+            <div className="bg-white p-6 rounded-lg shadow-xl mb-8">
+                <h2 className="text-2xl font-bold text-gray-700 text-center mb-6">Contact Issues Breakdown</h2>
+                <div className="flex justify-center h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                            <Pie
+                                data={contactIssuesData}
+                                cx="50%"
+                                cy="50%"
+                                outerRadius={120}
+                                fill="#8884d8"
+                                dataKey="value"
+                                labelLine={false}
+                                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                            >
+                                {contactIssuesData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                ))}
+                            </Pie>
+                            <Tooltip />
+                            <Legend />
+                        </PieChart>
+                    </ResponsiveContainer>
+                </div>
+            </div>
+
+            {/* Detailed Recruitment Data */}
+            <div className="bg-white p-6 rounded-lg shadow-xl">
+                <h2 className="text-2xl font-bold text-gray-700 text-center mb-6">Detailed Recruitment Data</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {detailedRecruitmentData.map((roleData, index) => (
+                        <div key={index} className="p-4 border border-gray-200 rounded-lg shadow-md">
+                            <h3 className="text-xl font-semibold text-gray-600 text-center mb-4">{roleData["Job Role"]}</h3>
+                            <div className="h-72">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart
+                                        data={Object.entries(roleData).filter(([key]) => key !== "Job Role").map(([key, value]) => ({ name: key, value: value }))}
+                                        margin={{ top: 20, right: 10, left: 10, bottom: 5 }}
+                                    >
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                                        <XAxis
+                                            dataKey="name"
+                                            stroke="#555"
+                                            angle={-45}
+                                            textAnchor="end"
+                                            height={70}
+                                            tick={{ fontSize: 10 }}
+                                        />
+                                        <YAxis stroke="#555" />
+                                        <Tooltip />
+                                        <Legend />
+                                        <Bar dataKey="value" fill={COLORS[index % COLORS.length]} name="Count" />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+        </div>
+    );
+};
+
+export default App;
