@@ -1,169 +1,340 @@
-import React from 'react';
-import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell
-} from 'recharts';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recruitment Analysis Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .rounded-lg {
+            border-radius: 0.5rem;
+        }
+        .rounded-full {
+            border-radius: 9999px;
+        }
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body class="p-8 bg-gray-100 min-h-screen">
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A2D9CE', '#D4E6F1', '#F7DC6F', '#AF7AC5'];
+    <h1 class="text-4xl font-extrabold text-center text-gray-800 mb-10">Recruitment Analysis Dashboard</h1>
 
-// Data extracted directly from the uploaded CSV file
-const detailedRecruitmentData = [
-    {
-        "Job Role": "Regional CRM Marketing Director, EF",
-        "Imported Candidates": 82,
-        "Score > 60%": 15,
-        "Added to Sequence": 11,
-        "No Email": 1,
-        "Address not found": 1,
-        "Accepted LinkedIn Connect": 4,
-        "Answered via LInkedin": 3
-    },
-    {
-        "Job Role": "Director of Marketing, Hyatt",
-        "Imported Candidates": 21,
-        "Score > 60%": 18,
-        "Added to Sequence": 14,
-        "No Email": 5,
-        "Address not found": 4,
-        "Accepted LinkedIn Connect": 7,
-        "Answered via LInkedin": 1
-    },
-    {
-        "Job Role": "Director of Marketing, Dusit",
-        "Imported Candidates": 20,
-        "Score > 60%": 14,
-        "Added to Sequence": 9,
-        "No Email": 5,
-        "Address not found": 2,
-        "Accepted LinkedIn Connect": 3,
-        "Answered via LInkedin": 0
-    }
-];
-
-// --- Data Aggregation for Charts ---
-// Recruitment Funnel Analysis Data
-const recruitmentFunnelData = (() => {
-    let imported = 0, scored = 0, added = 0, connected = 0, answered = 0;
-    detailedRecruitmentData.forEach(d => {
-        imported += d["Imported Candidates"];
-        scored += d["Score > 60%"];
-        added += d["Added to Sequence"];
-        connected += d["Accepted LinkedIn Connect"];
-        answered += d["Answered via LInkedin"];
-    });
-    return [
-        { name: 'Imported Candidates', value: imported },
-        { name: 'Score > 60%', value: scored },
-        { name: 'Added to Sequence', value: added },
-        { name: 'Accepted LinkedIn Connect', value: connected },
-        { name: 'Answered via LInkedin', value: answered }
-    ];
-})();
-
-// Contact Issues Breakdown Data
-const contactIssuesData = (() => {
-    let noEmail = 0, addressNotFound = 0;
-    detailedRecruitmentData.forEach(d => {
-        noEmail += d["No Email"];
-        addressNotFound += d["Address not found"];
-    });
-    return [
-        { name: 'No Email', value: noEmail },
-        { name: 'Address not found', value: addressNotFound }
-    ];
-})();
-
-const App = () => {
-    return (
-        <div className="bg-gray-100 p-8 min-h-screen font-sans">
-            <h1 className="text-4xl font-extrabold text-center text-gray-800 mb-10">Recruitment Analysis Dashboard</h1>
-
-            {/* Recruitment Funnel Analysis */}
-            <div className="bg-white p-6 rounded-lg shadow-xl mb-8">
-                <h2 className="text-2xl font-bold text-gray-700 text-center mb-6">Recruitment Funnel Analysis</h2>
-                <div className="h-96">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <BarChart
-                            data={recruitmentFunnelData}
-                            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                            layout="vertical"
-                        >
-                            <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-                            <XAxis type="number" stroke="#555" />
-                            <YAxis type="category" dataKey="name" stroke="#555" />
-                            <Tooltip
-                                contentStyle={{ borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
-                                labelStyle={{ fontWeight: 'bold' }}
-                            />
-                            <Legend />
-                            <Bar dataKey="value" fill="#8884d8" name="Total Count" barSize={30} />
-                        </BarChart>
-                    </ResponsiveContainer>
-                </div>
-            </div>
-
-            {/* Contact Issues Breakdown */}
-            <div className="bg-white p-6 rounded-lg shadow-xl mb-8">
-                <h2 className="text-2xl font-bold text-gray-700 text-center mb-6">Contact Issues Breakdown</h2>
-                <div className="flex justify-center h-80">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                            <Pie
-                                data={contactIssuesData}
-                                cx="50%"
-                                cy="50%"
-                                outerRadius={120}
-                                fill="#8884d8"
-                                dataKey="value"
-                                labelLine={false}
-                                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                            >
-                                {contactIssuesData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                ))}
-                            </Pie>
-                            <Tooltip />
-                            <Legend />
-                        </PieChart>
-                    </ResponsiveContainer>
-                </div>
-            </div>
-
-            {/* Detailed Recruitment Data */}
-            <div className="bg-white p-6 rounded-lg shadow-xl">
-                <h2 className="text-2xl font-bold text-gray-700 text-center mb-6">Detailed Recruitment Data</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {detailedRecruitmentData.map((roleData, index) => (
-                        <div key={index} className="p-4 border border-gray-200 rounded-lg shadow-md">
-                            <h3 className="text-xl font-semibold text-gray-600 text-center mb-4">{roleData["Job Role"]}</h3>
-                            <div className="h-72">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart
-                                        data={Object.entries(roleData).filter(([key]) => key !== "Job Role").map(([key, value]) => ({ name: key, value: value }))}
-                                        margin={{ top: 20, right: 10, left: 10, bottom: 5 }}
-                                    >
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-                                        <XAxis
-                                            dataKey="name"
-                                            stroke="#555"
-                                            angle={-45}
-                                            textAnchor="end"
-                                            height={70}
-                                            tick={{ fontSize: 10 }}
-                                        />
-                                        <YAxis stroke="#555" />
-                                        <Tooltip />
-                                        <Legend />
-                                        <Bar dataKey="value" fill={COLORS[index % COLORS.length]} name="Count" />
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
+    <!-- Recruitment Funnel Analysis Chart -->
+    <div class="bg-white p-6 rounded-lg shadow-xl mb-8">
+        <h2 class="text-2xl font-bold text-gray-700 text-center mb-6">Recruitment Funnel Analysis</h2>
+        <div class="w-full flex justify-center h-96">
+            <canvas id="recruitmentFunnelChart"></canvas>
         </div>
-    );
-};
+        <div class="flex justify-center mt-4">
+            <button
+                onclick="downloadChart('recruitmentFunnelChart', 'recruitment_funnel.png')"
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
+            >
+                Download Chart
+            </button>
+        </div>
+    </div>
 
-export default App;
+    <!-- Contact Issues Breakdown Chart -->
+    <div class="bg-white p-6 rounded-lg shadow-xl mb-8">
+        <h2 class="text-2xl font-bold text-gray-700 text-center mb-6">Contact Issues Breakdown</h2>
+        <div class="w-full flex justify-center h-80">
+            <canvas id="contactIssuesChart"></canvas>
+        </div>
+        <div class="flex justify-center mt-4">
+            <button
+                onclick="downloadChart('contactIssuesChart', 'contact_issues.png')"
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
+            >
+                Download Chart
+            </button>
+        </div>
+    </div>
+
+    <!-- Detailed Recruitment Data Charts -->
+    <div class="bg-white p-6 rounded-lg shadow-xl">
+        <h2 class="text-2xl font-bold text-gray-700 text-center mb-6">Detailed Recruitment Data</h2>
+        <div id="detailed-charts-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Charts will be dynamically inserted here by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Data extracted directly from the uploaded CSV file
+        const detailedRecruitmentData = [
+            {
+                "Job Role": "Regional CRM Marketing Director, EF",
+                "Imported Candidates": 82,
+                "Score > 60%": 15,
+                "Added to Sequence": 11,
+                "No Email": 1,
+                "Address not found": 1,
+                "Accepted LinkedIn Connect": 4,
+                "Answered via LInkedin": 3
+            },
+            {
+                "Job Role": "Director of Marketing, Hyatt",
+                "Imported Candidates": 21,
+                "Score > 60%": 18,
+                "Added to Sequence": 14,
+                "No Email": 5,
+                "Address not found": 4,
+                "Accepted LinkedIn Connect": 7,
+                "Answered via LInkedin": 1
+            },
+            {
+                "Job Role": "Director of Marketing, Dusit",
+                "Imported Candidates": 20,
+                "Score > 60%": 14,
+                "Added to Sequence": 9,
+                "No Email": 5,
+                "Address not found": 2,
+                "Accepted LinkedIn Connect": 3,
+                "Answered via LInkedin": 0
+            }
+        ];
+
+        const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A2D9CE', '#D4E6F1', '#F7DC6F', '#AF7AC5'];
+
+        /**
+         * Renders the recruitment funnel bar chart.
+         */
+        function renderRecruitmentFunnelChart() {
+            const funnelData = (() => {
+                let imported = 0, scored = 0, added = 0, connected = 0, answered = 0;
+                detailedRecruitmentData.forEach(d => {
+                    imported += d["Imported Candidates"];
+                    scored += d["Score > 60%"];
+                    added += d["Added to Sequence"];
+                    connected += d["Accepted LinkedIn Connect"];
+                    answered += d["Answered via LInkedin"];
+                });
+                return [
+                    { name: 'Imported Candidates', value: imported },
+                    { name: 'Score > 60%', value: scored },
+                    { name: 'Added to Sequence', value: added },
+                    { name: 'Accepted LinkedIn Connect', value: connected },
+                    { name: 'Answered via LInkedin', value: answered }
+                ];
+            })();
+
+            const ctx = document.getElementById('recruitmentFunnelChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: funnelData.map(d => d.name),
+                    datasets: [{
+                        label: 'Total Count',
+                        data: funnelData.map(d => d.value),
+                        backgroundColor: COLORS.slice(0, funnelData.length),
+                        borderColor: COLORS.slice(0, funnelData.length),
+                        borderWidth: 1,
+                        borderRadius: 5,
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#fff',
+                            titleColor: '#333',
+                            bodyColor: '#666',
+                            borderColor: '#ccc',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            padding: 10,
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            grid: { color: '#e0e0e0' },
+                            ticks: { color: '#555' }
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: { color: '#555' }
+                        }
+                    }
+                }
+            });
+        }
+
+        /**
+         * Renders the contact issues breakdown pie chart.
+         */
+        function renderContactIssuesChart() {
+            const contactIssuesData = (() => {
+                let noEmail = 0, addressNotFound = 0;
+                detailedRecruitmentData.forEach(d => {
+                    noEmail += d["No Email"];
+                    addressNotFound += d["Address not found"];
+                });
+                return [
+                    { name: 'No Email', value: noEmail },
+                    { name: 'Address not found', value: addressNotFound }
+                ];
+            })();
+
+            const ctx = document.getElementById('contactIssuesChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: contactIssuesData.map(d => d.name),
+                    datasets: [{
+                        data: contactIssuesData.map(d => d.value),
+                        backgroundColor: [COLORS[0], COLORS[1]],
+                        borderColor: '#fff',
+                        borderWidth: 2,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right' },
+                        tooltip: {
+                            backgroundColor: '#fff',
+                            titleColor: '#333',
+                            bodyColor: '#666',
+                            borderColor: '#ccc',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            padding: 10,
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    if (label) {
+                                        let total = contactIssuesData.reduce((sum, d) => sum + d.value, 0);
+                                        const value = context.parsed;
+                                        const percentage = ((value / total) * 100).toFixed(0);
+                                        return `${label}: ${value} (${percentage}%)`;
+                                    }
+                                    return '';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        /**
+         * Renders the individual bar charts for each job role.
+         */
+        function renderDetailedCharts() {
+            const container = document.getElementById('detailed-charts-container');
+            detailedRecruitmentData.forEach((roleData, index) => {
+                const safeJobRole = roleData["Job Role"].replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+                const canvasId = `detailedChart-${safeJobRole}`;
+
+                const chartDiv = document.createElement('div');
+                chartDiv.className = "p-4 border border-gray-200 rounded-lg shadow-md";
+                chartDiv.innerHTML = `
+                    <h3 class="text-xl font-semibold text-gray-600 text-center mb-4">${roleData["Job Role"]}</h3>
+                    <div class="h-72">
+                        <canvas id="${canvasId}"></canvas>
+                    </div>
+                    <div class="flex justify-center mt-4">
+                        <button
+                            onclick="downloadChart('${canvasId}', 'detailed_${safeJobRole}.png')"
+                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
+                        >
+                            Download Chart
+                        </button>
+                    </div>
+                `;
+                container.appendChild(chartDiv);
+
+                const metricsForChart = Object.entries(roleData).filter(([key]) => key !== "Job Role");
+                const labels = metricsForChart.map(([key]) => key);
+                const dataValues = metricsForChart.map(([, value]) => value);
+
+                const ctx = document.getElementById(canvasId).getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Count',
+                            data: dataValues,
+                            backgroundColor: COLORS[index % COLORS.length],
+                            borderColor: COLORS[index % COLORS.length],
+                            borderWidth: 1,
+                            borderRadius: 5,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#fff',
+                                titleColor: '#333',
+                                bodyColor: '#666',
+                                borderColor: '#ccc',
+                                borderWidth: 1,
+                                cornerRadius: 8,
+                                padding: 10,
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: '#555', autoSkip: false, maxRotation: 45, minRotation: 45 }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: '#e0e0e0' },
+                                ticks: { color: '#555' }
+                            }
+                        }
+                    }
+                });
+            });
+        }
+
+        /**
+         * Downloads the content of a canvas element as a PNG image.
+         * @param {string} canvasId The ID of the canvas element to download.
+         * @param {string} filename The desired filename for the downloaded image.
+         */
+        function downloadChart(canvasId, filename) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) {
+                console.error('Canvas element not found for ID:', canvasId);
+                return;
+            }
+
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Render all charts when the window loads
+        window.onload = function() {
+            renderRecruitmentFunnelChart();
+            renderContactIssuesChart();
+            renderDetailedCharts();
+        };
+    </script>
+</body>
+</html>
